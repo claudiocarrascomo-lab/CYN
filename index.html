@@ -1,316 +1,205 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CYN Family</title>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYN Family v2</title>
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background: linear-gradient(135deg, #1d2671, #c33764);
-      color: #222;
-    }
-
-    .app {
-      max-width: 480px;
-      margin: auto;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .header {
-      color: white;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .header h1 {
-      font-size: 34px;
-      margin-bottom: 5px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 18px;
-      padding: 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-    }
-
-    .resumen {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .box {
-      padding: 15px;
-      border-radius: 14px;
-      color: white;
-      font-weight: bold;
-    }
-
-    .ingresos { background: #00b894; }
-    .gastos { background: #d63031; }
-    .saldo { background: #0984e3; }
-    .pendiente { background: #fdcb6e; color: #222; }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 6px 0;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 15px;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 12px;
-      background: #6c5ce7;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      margin-top: 8px;
-    }
-
-    button:active {
-      transform: scale(0.98);
-    }
-
-    .btn-red {
-      background: #d63031;
-    }
-
-    .item {
-      background: #f1f2f6;
-      padding: 12px;
-      border-radius: 12px;
-      margin-top: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .item.pagado {
-      background: #d4edda;
-      text-decoration: line-through;
-      color: #2d6a4f;
-    }
-
-    .item button {
-      width: auto;
-      padding: 7px 10px;
-      margin: 0;
-      font-size: 13px;
-      background: #ff7675;
-    }
-
-    .check {
-      width: auto;
-    }
-
-    h2 {
-      margin-top: 0;
-      color: #2d3436;
-    }
-
-    footer {
-      text-align: center;
-      color: white;
-      font-weight: bold;
-      padding: 20px 0;
-    }
+    *{box-sizing:border-box;font-family:Arial,sans-serif}
+    body{margin:0;background:linear-gradient(135deg,#141e30,#243b55,#7f00ff);color:white}
+    .app{max-width:480px;margin:auto;min-height:100vh;padding:18px}
+    .header{text-align:center;margin-bottom:18px}
+    .header h1{font-size:34px;margin:10px 0 4px}
+    .card{background:rgba(255,255,255,.14);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.25);border-radius:22px;padding:18px;margin-bottom:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .box{border-radius:18px;padding:14px;font-weight:bold}
+    .green{background:#00b894}.red{background:#d63031}.blue{background:#0984e3}.yellow{background:#fdcb6e;color:#222}
+    h2{margin-top:0}
+    input,select{width:100%;padding:13px;margin:6px 0;border:none;border-radius:14px;font-size:15px}
+    button{width:100%;padding:13px;border:none;border-radius:14px;background:#00cec9;color:white;font-size:16px;font-weight:bold;margin-top:8px}
+    .danger{background:#d63031}
+    .item{background:rgba(255,255,255,.18);border-radius:16px;padding:12px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .item.pagado{background:rgba(0,184,148,.35);text-decoration:line-through}
+    .item button{width:auto;padding:7px 10px;margin:0;background:#ff7675}
+    .check{width:auto}
+    .progress{height:18px;background:rgba(255,255,255,.25);border-radius:20px;overflow:hidden}
+    .bar{height:100%;width:0%;background:#00b894}
+    .small{font-size:13px;opacity:.9}
+    footer{text-align:center;font-weight:bold;padding:18px 0;color:white}
   </style>
 </head>
 
 <body>
-  <div class="app">
-    <div class="header">
-      <h1>💰 CYN Family</h1>
-      <p>Controla los ingresos y gastos de tu hogar</p>
-    </div>
-
-    <div class="card resumen">
-      <div class="box ingresos">Ingresos<br>$<span id="totalIngresos">0</span></div>
-      <div class="box gastos">Gastos<br>$<span id="totalGastos">0</span></div>
-      <div class="box saldo">Saldo<br>$<span id="saldo">0</span></div>
-      <div class="box pendiente">Pendiente<br>$<span id="pendiente">0</span></div>
-    </div>
-
-    <div class="card">
-      <h2>Ingresos del mes</h2>
-      <input id="nombreIngreso" placeholder="Ej: Sueldo, bono, extra">
-      <input id="montoIngreso" type="number" placeholder="Monto">
-      <button onclick="agregarIngreso()">Agregar ingreso</button>
-      <div id="listaIngresos"></div>
-    </div>
-
-    <div class="card">
-      <h2>Compromisos del mes</h2>
-      <p>Marca cada gasto fijo cuando ya esté pagado.</p>
-      <input id="nombreFijo" placeholder="Ej: Dividendo, luz, internet">
-      <input id="montoFijo" type="number" placeholder="Monto">
-      <button onclick="agregarGastoFijo()">Agregar gasto fijo</button>
-      <div id="listaFijos"></div>
-    </div>
-
-    <div class="card">
-      <h2>Gastos nuevos</h2>
-      <input id="nombreVariable" placeholder="Ej: Supermercado, farmacia">
-      <input id="montoVariable" type="number" placeholder="Monto">
-      <button onclick="agregarGastoVariable()">Agregar gasto</button>
-      <div id="listaVariables"></div>
-    </div>
-
-    <button class="btn-red" onclick="reiniciarMes()">Reiniciar mes</button>
-
-    <footer>
-      CYN Family v1.0<br>
-      Desarrollado por Claudio Carrasco © 2026
-    </footer>
+<div class="app">
+  <div class="header">
+    <h1>💰 CYN Family</h1>
+    <p>Control financiero familiar</p>
   </div>
 
-  <script>
-    let ingresos = JSON.parse(localStorage.getItem("ingresos")) || [];
-    let gastosFijos = JSON.parse(localStorage.getItem("gastosFijos")) || [];
-    let gastosVariables = JSON.parse(localStorage.getItem("gastosVariables")) || [];
+  <div class="card grid">
+    <div class="box green">Ingresos<br>$<span id="totalIngresos">0</span></div>
+    <div class="box red">Gastos<br>$<span id="totalGastos">0</span></div>
+    <div class="box blue">Saldo<br>$<span id="saldo">0</span></div>
+    <div class="box yellow">Pendiente<br>$<span id="pendiente">0</span></div>
+  </div>
 
-    function guardarDatos() {
-      localStorage.setItem("ingresos", JSON.stringify(ingresos));
-      localStorage.setItem("gastosFijos", JSON.stringify(gastosFijos));
-      localStorage.setItem("gastosVariables", JSON.stringify(gastosVariables));
-    }
+  <div class="card">
+    <h2 id="estado">🟢 Estado financiero</h2>
+    <p id="mensajeEstado">Ingresa tus datos para calcular tu estado mensual.</p>
+    <div class="progress"><div class="bar" id="barraPagos"></div></div>
+    <p class="small"><span id="porcentajePagado">0</span>% de compromisos pagados</p>
+  </div>
 
-    function formato(num) {
-      return Number(num).toLocaleString("es-CL");
-    }
+  <div class="card">
+    <h2>Ingresos</h2>
+    <input id="nombreIngreso" placeholder="Ej: Sueldo">
+    <input id="montoIngreso" type="number" placeholder="Monto">
+    <button onclick="agregarIngreso()">Agregar ingreso</button>
+    <div id="listaIngresos"></div>
+  </div>
 
-    function agregarIngreso() {
-      const nombre = document.getElementById("nombreIngreso").value;
-      const monto = Number(document.getElementById("montoIngreso").value);
+  <div class="card">
+    <h2>Gastos fijos</h2>
+    <input id="nombreFijo" placeholder="Ej: Dividendo, luz, internet">
+    <input id="montoFijo" type="number" placeholder="Monto">
+    <input id="venceFijo" type="number" min="1" max="31" placeholder="Día de vencimiento. Ej: 15">
+    <button onclick="agregarGastoFijo()">Agregar gasto fijo</button>
+    <div id="listaFijos"></div>
+  </div>
 
-      if (!nombre || monto <= 0) {
-        alert("Ingresa un nombre y monto válido.");
-        return;
-      }
+  <div class="card">
+    <h2>Gastos variables</h2>
+    <input id="nombreVariable" placeholder="Ej: Supermercado">
+    <input id="montoVariable" type="number" placeholder="Monto">
+    <button onclick="agregarGastoVariable()">Agregar gasto</button>
+    <div id="listaVariables"></div>
+  </div>
 
-      ingresos.push({ nombre, monto });
-      document.getElementById("nombreIngreso").value = "";
-      document.getElementById("montoIngreso").value = "";
-      actualizar();
-    }
+  <button class="danger" onclick="reiniciarMes()">Reiniciar mes</button>
 
-    function agregarGastoFijo() {
-      const nombre = document.getElementById("nombreFijo").value;
-      const monto = Number(document.getElementById("montoFijo").value);
+  <footer>
+    CYN Family v2.0<br>
+    Desarrollado por Claudio Carrasco © 2026
+  </footer>
+</div>
 
-      if (!nombre || monto <= 0) {
-        alert("Ingresa un nombre y monto válido.");
-        return;
-      }
+<script>
+let ingresos = JSON.parse(localStorage.getItem("ingresos")) || [];
+let gastosFijos = JSON.parse(localStorage.getItem("gastosFijos")) || [];
+let gastosVariables = JSON.parse(localStorage.getItem("gastosVariables")) || [];
 
-      gastosFijos.push({ nombre, monto, pagado: false });
-      document.getElementById("nombreFijo").value = "";
-      document.getElementById("montoFijo").value = "";
-      actualizar();
-    }
+function guardar(){
+  localStorage.setItem("ingresos", JSON.stringify(ingresos));
+  localStorage.setItem("gastosFijos", JSON.stringify(gastosFijos));
+  localStorage.setItem("gastosVariables", JSON.stringify(gastosVariables));
+}
 
-    function agregarGastoVariable() {
-      const nombre = document.getElementById("nombreVariable").value;
-      const monto = Number(document.getElementById("montoVariable").value);
+function formato(n){return Number(n).toLocaleString("es-CL");}
 
-      if (!nombre || monto <= 0) {
-        alert("Ingresa un nombre y monto válido.");
-        return;
-      }
+function agregarIngreso(){
+  let nombre = nombreIngreso.value.trim();
+  let monto = Number(montoIngreso.value);
+  if(!nombre || monto<=0) return alert("Ingresa un ingreso válido.");
+  ingresos.push({nombre,monto});
+  nombreIngreso.value=""; montoIngreso.value="";
+  actualizar();
+}
 
-      gastosVariables.push({ nombre, monto, pagado: true });
-      document.getElementById("nombreVariable").value = "";
-      document.getElementById("montoVariable").value = "";
-      actualizar();
-    }
+function agregarGastoFijo(){
+  let nombre = nombreFijo.value.trim();
+  let monto = Number(montoFijo.value);
+  let vence = Number(venceFijo.value);
+  if(!nombre || monto<=0 || vence<1 || vence>31) return alert("Ingresa gasto, monto y vencimiento válido.");
+  gastosFijos.push({nombre,monto,vence,pagado:false});
+  nombreFijo.value=""; montoFijo.value=""; venceFijo.value="";
+  actualizar();
+}
 
-    function eliminarIngreso(index) {
-      ingresos.splice(index, 1);
-      actualizar();
-    }
+function agregarGastoVariable(){
+  let nombre = nombreVariable.value.trim();
+  let monto = Number(montoVariable.value);
+  if(!nombre || monto<=0) return alert("Ingresa un gasto válido.");
+  gastosVariables.push({nombre,monto});
+  nombreVariable.value=""; montoVariable.value="";
+  actualizar();
+}
 
-    function eliminarFijo(index) {
-      gastosFijos.splice(index, 1);
-      actualizar();
-    }
+function eliminarIngreso(i){if(confirm("¿Eliminar ingreso?")){ingresos.splice(i,1);actualizar();}}
+function eliminarFijo(i){if(confirm("¿Eliminar gasto fijo?")){gastosFijos.splice(i,1);actualizar();}}
+function eliminarVariable(i){if(confirm("¿Eliminar gasto?")){gastosVariables.splice(i,1);actualizar();}}
+function cambiarPagado(i){gastosFijos[i].pagado=!gastosFijos[i].pagado;actualizar();}
 
-    function eliminarVariable(index) {
-      gastosVariables.splice(index, 1);
-      actualizar();
-    }
+function actualizar(){
+  guardar();
 
-    function cambiarPagado(index) {
-      gastosFijos[index].pagado = !gastosFijos[index].pagado;
-      actualizar();
-    }
+  gastosFijos.sort((a,b)=>a.vence-b.vence);
 
-    function actualizar() {
-      guardarDatos();
+  let totalIngresos = ingresos.reduce((a,b)=>a+b.monto,0);
+  let totalFijos = gastosFijos.reduce((a,b)=>a+b.monto,0);
+  let totalVariables = gastosVariables.reduce((a,b)=>a+b.monto,0);
+  let totalGastos = totalFijos + totalVariables;
+  let saldoFinal = totalIngresos - totalGastos;
+  let pendienteFinal = gastosFijos.filter(g=>!g.pagado).reduce((a,b)=>a+b.monto,0);
 
-      const totalIngresos = ingresos.reduce((acc, item) => acc + item.monto, 0);
-      const totalFijos = gastosFijos.reduce((acc, item) => acc + item.monto, 0);
-      const totalVariables = gastosVariables.reduce((acc, item) => acc + item.monto, 0);
-      const totalGastos = totalFijos + totalVariables;
-      const pendiente = gastosFijos
-        .filter(item => !item.pagado)
-        .reduce((acc, item) => acc + item.monto, 0);
+  totalIngresosEl = document.getElementById("totalIngresos");
+  totalGastosEl = document.getElementById("totalGastos");
+  saldoEl = document.getElementById("saldo");
+  pendienteEl = document.getElementById("pendiente");
 
-      const saldo = totalIngresos - totalGastos;
+  totalIngresosEl.innerText = formato(totalIngresos);
+  totalGastosEl.innerText = formato(totalGastos);
+  saldoEl.innerText = formato(saldoFinal);
+  pendienteEl.innerText = formato(pendienteFinal);
 
-      document.getElementById("totalIngresos").innerText = formato(totalIngresos);
-      document.getElementById("totalGastos").innerText = formato(totalGastos);
-      document.getElementById("saldo").innerText = formato(saldo);
-      document.getElementById("pendiente").innerText = formato(pendiente);
+  let porcentajeSaldo = totalIngresos > 0 ? (saldoFinal / totalIngresos) * 100 : 0;
 
-      document.getElementById("listaIngresos").innerHTML = ingresos.map((item, index) => `
-        <div class="item">
-          <span>${item.nombre}: $${formato(item.monto)}</span>
-          <button onclick="eliminarIngreso(${index})">X</button>
-        </div>
-      `).join("");
+  if(totalIngresos === 0){
+    estado.innerText = "⚪ Estado financiero";
+    mensajeEstado.innerText = "Ingresa tus ingresos y gastos para calcular tu estado mensual.";
+  } else if(porcentajeSaldo > 30){
+    estado.innerText = "🟢 Estado financiero: Excelente";
+    mensajeEstado.innerText = "Vas muy bien. Tienes buen margen disponible este mes.";
+  } else if(porcentajeSaldo >= 10){
+    estado.innerText = "🟡 Estado financiero: Ajustado";
+    mensajeEstado.innerText = "Estás dentro del límite, pero conviene cuidar los gastos variables.";
+  } else {
+    estado.innerText = "🔴 Estado financiero: Riesgo";
+    mensajeEstado.innerText = "Tus gastos están muy altos respecto a tus ingresos.";
+  }
 
-      document.getElementById("listaFijos").innerHTML = gastosFijos.map((item, index) => `
-        <div class="item ${item.pagado ? 'pagado' : ''}">
-          <input class="check" type="checkbox" ${item.pagado ? "checked" : ""} onchange="cambiarPagado(${index})">
-          <span>${item.nombre}: $${formato(item.monto)}</span>
-          <button onclick="eliminarFijo(${index})">X</button>
-        </div>
-      `).join("");
+  let pagados = gastosFijos.filter(g=>g.pagado).length;
+  let porcentajePagos = gastosFijos.length ? Math.round((pagados/gastosFijos.length)*100) : 0;
+  barraPagos.style.width = porcentajePagos + "%";
+  porcentajePagado.innerText = porcentajePagos;
 
-      document.getElementById("listaVariables").innerHTML = gastosVariables.map((item, index) => `
-        <div class="item">
-          <span>${item.nombre}: $${formato(item.monto)}</span>
-          <button onclick="eliminarVariable(${index})">X</button>
-        </div>
-      `).join("");
-    }
+  listaIngresos.innerHTML = ingresos.map((x,i)=>`
+    <div class="item">
+      <span>${x.nombre}<br><b>$${formato(x.monto)}</b></span>
+      <button onclick="eliminarIngreso(${i})">X</button>
+    </div>`).join("");
 
-    function reiniciarMes() {
-      if (confirm("¿Seguro que quieres reiniciar el mes?")) {
-        ingresos = [];
-        gastosFijos = [];
-        gastosVariables = [];
-        actualizar();
-      }
-    }
+  listaFijos.innerHTML = gastosFijos.map((x,i)=>`
+    <div class="item ${x.pagado?'pagado':''}">
+      <input class="check" type="checkbox" ${x.pagado?'checked':''} onchange="cambiarPagado(${i})">
+      <span>Día ${x.vence} - ${x.nombre}<br><b>$${formato(x.monto)}</b></span>
+      <button onclick="eliminarFijo(${i})">X</button>
+    </div>`).join("");
 
+  listaVariables.innerHTML = gastosVariables.map((x,i)=>`
+    <div class="item">
+      <span>${x.nombre}<br><b>$${formato(x.monto)}</b></span>
+      <button onclick="eliminarVariable(${i})">X</button>
+    </div>`).join("");
+}
+
+function reiniciarMes(){
+  if(confirm("¿Seguro que quieres reiniciar el mes?")){
+    ingresos=[]; gastosFijos=[]; gastosVariables=[];
     actualizar();
-  </script>
+  }
+}
+
+actualizar();
+</script>
 </body>
 </html>
